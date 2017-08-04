@@ -7,13 +7,14 @@ import (
 
 // SMTPServer represents an SMTP server
 type SMTPServer struct {
-	listener net.Listener
+	listenPort string
+	listener   net.Listener
 }
 
 // Listen starts listening by creating a new listener
 // This satisfies the TCPServer interface
 func (s *SMTPServer) Listen() (net.Listener, error) {
-	listener, err := net.Listen("tcp", "localhost:2525") // TODO
+	listener, err := net.Listen("tcp", s.listenPort)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +50,8 @@ func (s *SMTPServer) ServePacket(pc net.PacketConn) error {
 }
 
 // NewSMTPServer returns a new instance of SMTPServer type
-func NewSMTPServer() *SMTPServer {
-	return &SMTPServer{}
+func NewSMTPServer(cfg *Config) *SMTPServer {
+	return &SMTPServer{
+		listenPort: cfg.ListenPort,
+	}
 }

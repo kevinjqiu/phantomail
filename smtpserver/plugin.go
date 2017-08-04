@@ -1,6 +1,8 @@
 package smtpserver
 
 import (
+	"fmt"
+
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyfile"
 )
@@ -26,14 +28,52 @@ type smtpContext struct {
 	configs       []*Config
 }
 
+func (c *smtpContext) saveConfig(key string, cfg *Config) {
+	c.configs = append(c.configs, cfg)
+	c.keysToConfigs[key] = cfg
+}
+
 func (c *smtpContext) InspectServerBlocks(sourceFile string, serverBlocks []caddyfile.ServerBlock) ([]caddyfile.ServerBlock, error) {
-	return serverBlocks, nil // TODO
+	fmt.Println(serverBlocks)
+	currentKey := ""
+	cfg := make(map[string][]string)
+	for _, serverBlock := range serverBlocks {
+		for _, key := range serverBlock.Keys {
+			if _, dup := c.keysToConfigs[key]; dup {
+				return serverBlocks, fmt.Errorf("duplicate key: %s", key)
+			}
+
+			fmt.Println(key)
+			switch key {
+			case "smtp":
+				currentKey = key
+				cfg[currentKey] = []string{}
+			default:
+				cfg[currentKey] = append(cfg[currentKey], key)
+			}
+		}
+	}
+
+	for k, v := range cfg {
+		if len(v) == 0 {
+			return serverBlocks, fmt.Errorf("invalid configuration: %s", k)
+		}
+
+		smtpServerConfig := &Config{
+			ListenPort: v[0],
+		}
+
+		c.saveConfig(k, smtpServerConfig)
+	}
+	return serverBlocks, nil
 }
 
 func (c *smtpContext) MakeServers() ([]caddy.Server, error) {
 	var servers []caddy.Server
 
-	servers = append(servers, NewSMTPServer())
+	for _, cfg := range c.configs {
+		servers = append(servers, NewSMTPServer(cfg))
+	}
 	return servers, nil
 }
 
