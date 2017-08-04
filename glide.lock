@@ -1,0 +1,11 @@
+hash: 59b671d4d90054688a6314baa70b97a4c8941034ab2842cfd6dea79fe091e1ce
+updated: 2017-08-04T16:53:51.921455102-04:00
+imports:
+- name: github.com/flynn/go-shlex
+  version: 3f9db97f856818214da2e1057f8ad84803971cff
+  repo: https://github.com/flynn/go-shlex
+- name: github.com/mholt/caddy
+  version: e7f08bff38988c3049b7fda301c52a681af63cd8
+  subpackages:
+  - caddyfile
+testImports: []

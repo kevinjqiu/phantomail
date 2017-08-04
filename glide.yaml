@@ -1,0 +1,6 @@
+package: github.com/kevinjqiu/phantomail
+import:
+- package: github.com/mholt/caddy
+  version: ^0.10.6
+  subpackages:
+  - caddyfile
