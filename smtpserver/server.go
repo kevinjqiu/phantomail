@@ -14,14 +14,14 @@ import (
 
 // SMTPServer represents an SMTP server
 type SMTPServer struct {
-	listenPort string
-	listener   net.Listener
+	listener net.Listener
+	config   *Config
 }
 
 // Listen starts listening by creating a new listener
 // This satisfies the TCPServer interface
 func (s *SMTPServer) Listen() (net.Listener, error) {
-	listener, err := net.Listen("tcp", s.listenPort)
+	listener, err := net.Listen("tcp", s.config.ListenPort)
 	if err != nil {
 		return nil, err
 	}
@@ -145,13 +145,25 @@ func (s *SMTPServer) Stop() error {
 // OnStartupComplete shows the current effective configuration
 func (s *SMTPServer) OnStartupComplete() {
 	if !caddy.Quiet {
-		log.Printf("SMTP server started on port %s\n", s.listenPort)
+		log.Printf("SMTP server started with configuration: %s\n", s.config)
 	}
 }
 
 // NewSMTPServer returns a new instance of SMTPServer type
 func NewSMTPServer(cfg *Config) *SMTPServer {
 	return &SMTPServer{
-		listenPort: cfg.ListenPort,
+		config: cfg,
 	}
+}
+
+// GetConfig gets the Config given the controller
+func GetConfig(c *caddy.Controller) *Config {
+	ctx := c.Context().(*smtpContext)
+	key := strings.ToLower(c.Key)
+	if key == serverType {
+		if cfg, ok := ctx.keysToConfigs[key]; ok {
+			return cfg
+		}
+	}
+	return &Config{}
 }

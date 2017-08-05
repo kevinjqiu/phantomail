@@ -10,7 +10,7 @@ import (
 
 const serverType = "smtp"
 
-var directives = []string{"hostname"}
+var directives = []string{"hostnames"}
 
 func init() {
 	caddy.RegisterServerType(serverType, caddy.ServerType{
@@ -79,7 +79,7 @@ func (c *smtpContext) MakeServers() ([]caddy.Server, error) {
 
 // Config contains configuration details about an SMTP server type
 type Config struct {
-	Hostname   string
+	Hostnames  []string
 	ListenPort string
 }
 
