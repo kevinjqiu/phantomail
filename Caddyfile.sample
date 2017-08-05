@@ -1,0 +1,3 @@
+smtp :2525 {
+    hostnames "phantomail.com", "mail.phantomail.com"
+}
