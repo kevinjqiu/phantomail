@@ -3,6 +3,7 @@ package smtpserver
 import (
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"strings"
 
@@ -64,6 +65,7 @@ func newSMTPClient(conn net.Conn) *smtpClient {
 
 func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, err error) {
 	m := msg.Parse(client.proto.Hostname)
+	log.Println("onMessageReceived")
 	fmt.Printf("From: %s\n", m.From)
 	fmt.Printf("To: %s\n", m.To)
 	fmt.Printf("Received: %s\n", m.Created)

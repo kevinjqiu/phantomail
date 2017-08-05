@@ -2,6 +2,7 @@ package smtpserver
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyfile"
@@ -34,7 +35,7 @@ func (c *smtpContext) saveConfig(key string, cfg *Config) {
 }
 
 func (c *smtpContext) InspectServerBlocks(sourceFile string, serverBlocks []caddyfile.ServerBlock) ([]caddyfile.ServerBlock, error) {
-	fmt.Println(serverBlocks)
+	log.Println(serverBlocks)
 	currentKey := ""
 	cfg := make(map[string][]string)
 	for _, serverBlock := range serverBlocks {
@@ -43,7 +44,6 @@ func (c *smtpContext) InspectServerBlocks(sourceFile string, serverBlocks []cadd
 				return serverBlocks, fmt.Errorf("duplicate key: %s", key)
 			}
 
-			fmt.Println(key)
 			switch key {
 			case "smtp":
 				currentKey = key
