@@ -1,9 +1,13 @@
 hash: 59b671d4d90054688a6314baa70b97a4c8941034ab2842cfd6dea79fe091e1ce
-updated: 2017-08-04T16:53:51.921455102-04:00
+updated: 2017-08-04T18:28:04.59444176-04:00
 imports:
 - name: github.com/flynn/go-shlex
   version: 3f9db97f856818214da2e1057f8ad84803971cff
   repo: https://github.com/flynn/go-shlex
+- name: github.com/mailhog/data
+  version: 024d554958b5bea5db220bfd84922a584d878ded
+- name: github.com/mailhog/smtp
+  version: 0c4e9b7e0625fec61d0c30d7b2f6c62852be6c54
 - name: github.com/mholt/caddy
   version: e7f08bff38988c3049b7fda301c52a681af63cd8
   subpackages:
