@@ -74,7 +74,7 @@ func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, e
 	return "", nil
 }
 
-func (client *smtpClient) write(reply *smtp.Reply) {
+func (client *smtpClient) writeReply(reply *smtp.Reply) {
 	for _, line := range reply.Lines() {
 		client.writer.Write([]byte(line))
 	}
@@ -99,7 +99,7 @@ func (client *smtpClient) read() bool {
 		client.line = line
 
 		if reply != nil {
-			client.write(reply)
+			client.writeReply(reply)
 			if reply.Status == 221 {
 				client.conn.Close()
 			}
@@ -116,7 +116,7 @@ func (client *smtpClient) handle() {
 		client.conn.Close()
 	}()
 	reply := client.proto.Start()
-	client.write(reply)
+	client.writeReply(reply)
 	for client.read() == true {
 	}
 }
@@ -159,11 +159,14 @@ func NewSMTPServer(cfg *Config) *SMTPServer {
 // GetConfig gets the Config given the controller
 func GetConfig(c *caddy.Controller) *Config {
 	ctx := c.Context().(*smtpContext)
-	key := strings.ToLower(c.Key)
+	key := c.ServerType()
 	if key == serverType {
 		if cfg, ok := ctx.keysToConfigs[key]; ok {
 			return cfg
 		}
 	}
-	return &Config{}
+	// test config
+	testConfig := &Config{}
+	ctx.keysToConfigs[key] = testConfig
+	return testConfig
 }

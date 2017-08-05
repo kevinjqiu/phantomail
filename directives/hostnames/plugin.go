@@ -1,4 +1,4 @@
-package hostname
+package hostnames
 
 import (
 	"github.com/kevinjqiu/phantomail/smtpserver"
@@ -12,17 +12,32 @@ func init() {
 	})
 }
 
+func hostAlreadyExists(hostnames []string, newHost string) bool {
+	for _, hostname := range hostnames {
+		if hostname == newHost {
+			return true
+		}
+	}
+	return false
+}
+
 func setupHost(c *caddy.Controller) error {
 	config := smtpserver.GetConfig(c)
-	if c.Key != "smtp" {
-		return nil
-	}
-
 	for c.Next() {
-		if !c.NextArg() {
+		if c.Val() != "hostnames" {
+			return nil
+		}
+		args := c.RemainingArgs()
+		if len(args) == 0 {
 			return c.ArgErr()
 		}
-		config.Hostnames = append(config.Hostnames, c.Val())
+
+		for _, arg := range args {
+			if hostAlreadyExists(config.Hostnames, arg) {
+				continue
+			}
+			config.Hostnames = append(config.Hostnames, arg)
+		}
 	}
 	return nil
 }
