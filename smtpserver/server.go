@@ -9,6 +9,7 @@ import (
 
 	"github.com/mailhog/data"
 	"github.com/mailhog/smtp"
+	"github.com/mholt/caddy"
 )
 
 // SMTPServer represents an SMTP server
@@ -108,16 +109,15 @@ func (client *smtpClient) read() bool {
 }
 
 func (client *smtpClient) handle() {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Printf("Fatal error: %s\n", err)
+		}
+		client.conn.Close()
+	}()
 	reply := client.proto.Start()
-
 	client.write(reply)
 	for client.read() == true {
-	}
-	for {
-		hasMore := client.read()
-		if hasMore == false {
-			break
-		}
 	}
 }
 
@@ -131,6 +131,22 @@ func (s *SMTPServer) ListenPacket() (net.PacketConn, error) {
 // This satisfies the UDPServer interface
 func (s *SMTPServer) ServePacket(pc net.PacketConn) error {
 	return nil // Ignore
+}
+
+// Stop closes the listening socket
+func (s *SMTPServer) Stop() error {
+	err := s.listener.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// OnStartupComplete shows the current effective configuration
+func (s *SMTPServer) OnStartupComplete() {
+	if !caddy.Quiet {
+		log.Printf("SMTP server started on port %s\n", s.listenPort)
+	}
 }
 
 // NewSMTPServer returns a new instance of SMTPServer type
