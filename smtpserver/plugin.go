@@ -10,7 +10,7 @@ import (
 
 const serverType = "smtp"
 
-var directives = []string{"host"}
+var directives = []string{"hostname"}
 
 func init() {
 	caddy.RegisterServerType(serverType, caddy.ServerType{
