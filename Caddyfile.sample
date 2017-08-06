@@ -3,6 +3,5 @@ smtp://*:2525 {
     storage storm {
         path "phantomail.db"
     }
-    storage maildir {
-    }
+    storage maildir
 }
