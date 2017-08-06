@@ -37,36 +37,49 @@ func (s *SMTPServer) Serve(listener net.Listener) error {
 			return err
 		}
 
-		client := newSMTPClient(conn)
+		client := newSMTPClient(conn, s.config.MessageMiddlewares)
 
 		go client.handle()
 	}
 }
 
 type smtpClient struct {
-	conn   net.Conn
-	writer io.Writer
-	reader io.Reader
-	line   string
-	proto  *smtp.Protocol
+	conn               net.Conn
+	writer             io.Writer
+	reader             io.Reader
+	line               string
+	proto              *smtp.Protocol
+	messageMiddlewares []MessageMiddleware
 }
 
-func newSMTPClient(conn net.Conn) *smtpClient {
+func newSMTPClient(conn net.Conn, messageMiddlewares []MessageMiddleware) *smtpClient {
 	proto := smtp.NewProtocol()
 	client := &smtpClient{
-		conn:   conn,
-		writer: io.Writer(conn),
-		reader: io.Reader(conn),
-		proto:  proto,
+		conn:               conn,
+		writer:             io.Writer(conn),
+		reader:             io.Reader(conn),
+		proto:              proto,
+		messageMiddlewares: messageMiddlewares,
 	}
-	proto.MessageReceivedHandler = client.onMessageReceived
+	// proto.MessageReceivedHandler = client.messageReceivedHandler
 	// TODO: other handlers
 	return client
 }
 
-func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, err error) {
+// SMTPMessage represents an SMTP Message
+type SMTPMessage struct {
+	data.SMTPMessage
+}
+
+// func (client *smtpClient) messageReceivedHandler(msg *data.SMTPMessage) (id string, err error) {
+// 	for _, middleware := range client.messageMiddlewares {
+// 		log.Printf("Executing middleware: %s\n", middleware.Name())
+
+// 	}
+// }
+
+func (client *smtpClient) onMessageReceived(msg *SMTPMessage) (id string, err error) {
 	m := msg.Parse(client.proto.Hostname)
-	log.Println("onMessageReceived")
 	fmt.Printf("From: %s\n", m.From)
 	fmt.Printf("To: %s\n", m.To)
 	fmt.Printf("Received: %s\n", m.Created)

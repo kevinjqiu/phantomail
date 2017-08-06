@@ -94,14 +94,20 @@ func (c *smtpContext) MakeServers() ([]caddy.Server, error) {
 
 // Config contains configuration details about an SMTP server type
 type Config struct {
-	Hostnames []string
-	BindPort  string
-	BindAddr  string
+	Hostnames          []string
+	BindPort           string
+	BindAddr           string
+	MessageMiddlewares []MessageMiddleware
 }
 
 // Bind returns the bind information (address + port) for the SMTP server
 func (c *Config) Bind() string {
 	return fmt.Sprintf("%s:%s", c.BindAddr, c.BindPort)
+}
+
+// AddMessageMiddleware adds the message middleware to the config
+func (c *Config) AddMessageMiddleware(mm MessageMiddleware) {
+	c.MessageMiddlewares = append(c.MessageMiddlewares, mm)
 }
 
 func newContext() caddy.Context {

@@ -1,7 +1,7 @@
 package backends
 
 import (
-	"fmt"
+	"github.com/kevinjqiu/phantomail/smtpserver"
 
 	"github.com/mholt/caddy"
 )
@@ -10,7 +10,8 @@ type stormConfig struct {
 	path string
 }
 
-func NewStormConfig(c *caddy.Controller) (*stormConfig, error) {
+// NewStormStorageBackend creates a new instance of stormStorageBackend
+func NewStormStorageBackend(c *caddy.Controller, next smtpserver.MessageHandler) StormStorageBackend {
 	config := stormConfig{}
 	for c.NextBlock() {
 		key := c.Val()
@@ -23,9 +24,17 @@ func NewStormConfig(c *caddy.Controller) (*stormConfig, error) {
 			}
 		}
 	}
-	fmt.Println(config)
-	return &config, nil
+	return StormStorageBackend{Next: next} // TODO
 }
 
-type StormBackend struct {
+type StormStorageBackend struct {
+	Next smtpserver.MessageHandler
+}
+
+func (s StormStorageBackend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
+	return smtpserver.NextOrFailure(s.Name(), s.Next, msg)
+}
+
+func (s StormStorageBackend) Name() string {
+	return "StormStorageBackend"
 }
