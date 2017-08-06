@@ -1,3 +1,8 @@
 smtp://*:2525 {
     hostnames "phantomail.com" "mail.phantomail.com"
+    storage storm {
+        path "phantomail.db"
+    }
+    storage maildir {
+    }
 }
