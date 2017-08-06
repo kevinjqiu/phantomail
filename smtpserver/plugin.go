@@ -11,7 +11,7 @@ import (
 
 const serverType = "smtp"
 
-var directives = []string{"hostnames"}
+var directives = []string{"hostnames", "storage"}
 
 func init() {
 	caddy.RegisterServerType(serverType, caddy.ServerType{
