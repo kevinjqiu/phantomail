@@ -2,6 +2,8 @@ package smtpserver
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyfile"
@@ -31,6 +33,32 @@ type smtpContext struct {
 func (c *smtpContext) saveConfig(key string, cfg *Config) {
 	c.configs = append(c.configs, cfg)
 	c.keysToConfigs[key] = cfg
+}
+
+const defaultSMTPPort = 25
+
+func parseSMTPLabel(label string) (string, int, error) {
+	label = strings.ToLower(label)
+	if !strings.HasPrefix(label, "smtp://") {
+		return "", 0, fmt.Errorf("%s does not start with 'smtp://'", label)
+	}
+	label = strings.TrimPrefix(label, "smtp://")
+	parts := strings.Split(label, ":")
+	if len(parts) == 0 || len(parts) > 2 {
+		return "", 0, fmt.Errorf("%s does not contain a binding IP and port", label)
+	}
+	bindAddr := parts[0]
+	if bindAddr == "*" {
+		bindAddr = "0.0.0.0"
+	}
+	if len(parts) == 1 {
+		return bindAddr, defaultSMTPPort, nil
+	}
+	port, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return "", 0, err
+	}
+	return bindAddr, port, nil
 }
 
 func (c *smtpContext) InspectServerBlocks(sourceFile string, serverBlocks []caddyfile.ServerBlock) ([]caddyfile.ServerBlock, error) {

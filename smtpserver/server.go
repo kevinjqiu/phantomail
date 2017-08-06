@@ -102,6 +102,7 @@ func (client *smtpClient) read() bool {
 			client.writeReply(reply)
 			if reply.Status == 221 {
 				client.conn.Close()
+				return false
 			}
 		}
 	}
