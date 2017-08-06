@@ -1,8 +1,6 @@
 package storage
 
 import (
-	"fmt"
-
 	"github.com/kevinjqiu/phantomail/smtpserver"
 	"github.com/kevinjqiu/phantomail/smtpserver/directives/storage/backends"
 	"github.com/mholt/caddy"
@@ -15,22 +13,17 @@ func init() {
 	})
 }
 
-// Config is the interface for configs for different storage backends
-type Config interface {
-}
-
-func parseStorageConfigs(c *caddy.Controller) (*[]Config, error) {
+func parseStorageConfigs(c *caddy.Controller) error {
 	config := smtpserver.GetConfig(c)
 
-	var storageConfigs []Config
 	for c.Next() {
 		key := c.Val()
 		if key != "storage" {
-			return nil, nil
+			return nil
 		}
 		args := c.RemainingArgs()
 		if len(args) != 1 {
-			return nil, c.ArgErr()
+			return c.ArgErr()
 		}
 		storageType := args[0]
 		if storageType == "storm" {
@@ -40,11 +33,11 @@ func parseStorageConfigs(c *caddy.Controller) (*[]Config, error) {
 		} else if storageType == "maildir" {
 		}
 	}
-	return &storageConfigs, nil
+	return nil
 }
 
 func setupStorage(c *caddy.Controller) error {
-	_, err := parseStorageConfigs(c)
+	err := parseStorageConfigs(c)
 	if err != nil {
 		return err
 	}

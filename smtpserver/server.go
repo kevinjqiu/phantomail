@@ -71,13 +71,6 @@ type SMTPMessage struct {
 	data.SMTPMessage
 }
 
-// func (client *smtpClient) messageReceivedHandler(msg *data.SMTPMessage) (id string, err error) {
-// 	for _, middleware := range client.messageMiddlewares {
-// 		log.Printf("Executing middleware: %s\n", middleware.Name())
-
-// 	}
-// }
-
 func (client *smtpClient) onMessageReceived(msg *SMTPMessage) (id string, err error) {
 	m := msg.Parse(client.proto.Hostname)
 	fmt.Printf("From: %s\n", m.From)
@@ -159,12 +152,13 @@ func (s *SMTPServer) Stop() error {
 // OnStartupComplete shows the current effective configuration
 func (s *SMTPServer) OnStartupComplete() {
 	if !caddy.Quiet {
-		log.Printf("SMTP server started with configuration: %s\n", s.config)
+		log.Printf("SMTP server started with configuration: %v\n", s.config)
 	}
 }
 
 // NewSMTPServer returns a new instance of SMTPServer type
 func NewSMTPServer(cfg *Config) *SMTPServer {
+	cfg.buildMiddlewareStacks()
 	return &SMTPServer{
 		config: cfg,
 	}
