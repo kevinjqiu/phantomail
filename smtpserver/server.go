@@ -160,8 +160,8 @@ func NewSMTPServer(cfg *Config) *SMTPServer {
 // GetConfig gets the Config given the controller
 func GetConfig(c *caddy.Controller) *Config {
 	ctx := c.Context().(*smtpContext)
-	key := c.ServerType()
-	if key == serverType {
+	key := c.Key
+	if c.ServerType() == serverType {
 		if cfg, ok := ctx.keysToConfigs[key]; ok {
 			return cfg
 		}
