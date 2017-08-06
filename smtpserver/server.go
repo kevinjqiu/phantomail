@@ -21,7 +21,7 @@ type SMTPServer struct {
 // Listen starts listening by creating a new listener
 // This satisfies the TCPServer interface
 func (s *SMTPServer) Listen() (net.Listener, error) {
-	listener, err := net.Listen("tcp", s.config.ListenPort)
+	listener, err := net.Listen("tcp", s.config.Bind())
 	if err != nil {
 		return nil, err
 	}

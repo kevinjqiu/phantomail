@@ -74,8 +74,8 @@ func (c *smtpContext) InspectServerBlocks(sourceFile string, serverBlocks []cadd
 				return serverBlocks, err
 			}
 			smtpServerConfig := &Config{
-				ListenPort: port,
-				BindAddr:   bindAddr,
+				BindPort: port,
+				BindAddr: bindAddr,
 			}
 			c.saveConfig(key, smtpServerConfig)
 		}
@@ -94,9 +94,14 @@ func (c *smtpContext) MakeServers() ([]caddy.Server, error) {
 
 // Config contains configuration details about an SMTP server type
 type Config struct {
-	Hostnames  []string
-	ListenPort string
-	BindAddr   string
+	Hostnames []string
+	BindPort  string
+	BindAddr  string
+}
+
+// Bind returns the bind information (address + port) for the SMTP server
+func (c *Config) Bind() string {
+	return fmt.Sprintf("%s:%s", c.BindAddr, c.BindPort)
 }
 
 func newContext() caddy.Context {
