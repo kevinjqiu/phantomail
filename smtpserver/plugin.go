@@ -35,17 +35,17 @@ func (c *smtpContext) saveConfig(key string, cfg *Config) {
 	c.keysToConfigs[key] = cfg
 }
 
-const defaultSMTPPort = 25
+const defaultSMTPPort = "25"
 
-func parseSMTPLabel(label string) (string, int, error) {
+func parseSMTPLabel(label string) (string, string, error) {
 	label = strings.ToLower(label)
 	if !strings.HasPrefix(label, "smtp://") {
-		return "", 0, fmt.Errorf("%s does not start with 'smtp://'", label)
+		return "", "", fmt.Errorf("%s does not start with 'smtp://'", label)
 	}
 	label = strings.TrimPrefix(label, "smtp://")
 	parts := strings.Split(label, ":")
 	if len(parts) == 0 || len(parts) > 2 {
-		return "", 0, fmt.Errorf("%s does not contain a binding IP and port", label)
+		return "", "", fmt.Errorf("%s does not contain a binding IP and port", label)
 	}
 	bindAddr := parts[0]
 	if bindAddr == "*" {
@@ -54,42 +54,31 @@ func parseSMTPLabel(label string) (string, int, error) {
 	if len(parts) == 1 {
 		return bindAddr, defaultSMTPPort, nil
 	}
-	port, err := strconv.Atoi(parts[1])
+	port := parts[1]
+	_, err := strconv.Atoi(port)
 	if err != nil {
-		return "", 0, err
+		return "", "", err
 	}
 	return bindAddr, port, nil
 }
 
 func (c *smtpContext) InspectServerBlocks(sourceFile string, serverBlocks []caddyfile.ServerBlock) ([]caddyfile.ServerBlock, error) {
-	currentKey := ""
-	cfg := make(map[string][]string)
 	for _, serverBlock := range serverBlocks {
 		for _, key := range serverBlock.Keys {
 			if _, dup := c.keysToConfigs[key]; dup {
 				return serverBlocks, fmt.Errorf("duplicate key: %s", key)
 			}
 
-			switch key {
-			case "smtp":
-				currentKey = key
-				cfg[currentKey] = []string{}
-			default:
-				cfg[currentKey] = append(cfg[currentKey], key)
+			bindAddr, port, err := parseSMTPLabel(key)
+			if err != nil {
+				return serverBlocks, err
 			}
+			smtpServerConfig := &Config{
+				ListenPort: port,
+				BindAddr:   bindAddr,
+			}
+			c.saveConfig(key, smtpServerConfig)
 		}
-	}
-
-	for k, v := range cfg {
-		if len(v) == 0 {
-			return serverBlocks, fmt.Errorf("invalid configuration: %s", k)
-		}
-
-		smtpServerConfig := &Config{
-			ListenPort: v[0],
-		}
-
-		c.saveConfig(k, smtpServerConfig)
 	}
 	return serverBlocks, nil
 }
@@ -107,6 +96,7 @@ func (c *smtpContext) MakeServers() ([]caddy.Server, error) {
 type Config struct {
 	Hostnames  []string
 	ListenPort string
+	BindAddr   string
 }
 
 func newContext() caddy.Context {
