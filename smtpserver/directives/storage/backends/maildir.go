@@ -2,19 +2,22 @@ package backends
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/kevinjqiu/phantomail/smtpserver"
 	"github.com/mholt/caddy"
+	md "github.com/sloonz/go-maildir"
 )
 
-type maildirConfig struct {
+// MaildirConfig is the configuration for the maildir storage backend
+type MaildirConfig struct {
 	rootPath string
 }
 
 // MaildirStorageBackend is the maildir storage backend
 type MaildirStorageBackend struct {
 	Next   smtpserver.MessageHandler
-	config maildirConfig
+	Config MaildirConfig
 }
 
 // Name is the name of the `MessageHandler`
@@ -24,11 +27,21 @@ func (m MaildirStorageBackend) Name() string {
 
 // MessageReceived is the handler method of a `MessageHandler`
 func (m MaildirStorageBackend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
+	maildir, err := md.New(m.Config.rootPath, true)
+	if err != nil {
+		return "", err
+	}
+	filename, err := maildir.CreateMail(msg.Bytes())
+	if err != nil {
+		return "", err
+	}
+	log.Printf("Saved message to %s\n", filename)
 	return smtpserver.Next(m.Next, msg)
 }
 
-func getMaildirConfig(c *caddy.Controller) (maildirConfig, error) {
-	config := maildirConfig{}
+// ParseMaildirConfig parses the maildir configuration
+func ParseMaildirConfig(c *caddy.Controller) (MaildirConfig, error) {
+	config := MaildirConfig{}
 	for c.NextBlock() {
 		key := c.Val()
 		args := c.RemainingArgs()
@@ -46,13 +59,4 @@ func getMaildirConfig(c *caddy.Controller) (maildirConfig, error) {
 		return config, fmt.Errorf("`rootPath` is mandatory for `maildir`")
 	}
 	return config, nil
-}
-
-// NewMaildirBackend creates a new instance of `MaildirStorageBackend`
-func NewMaildirBackend(c *caddy.Controller, next smtpserver.MessageHandler) (MaildirStorageBackend, error) {
-	config, err := getMaildirConfig(c)
-	if err != nil {
-		return MaildirStorageBackend{}, nil
-	}
-	return MaildirStorageBackend{Next: next, config: config}, nil
 }

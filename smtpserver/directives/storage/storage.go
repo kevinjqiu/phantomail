@@ -31,6 +31,13 @@ func parseStorageConfigs(c *caddy.Controller) error {
 				return backends.NewStormStorageBackend(c, next)
 			})
 		} else if storageType == "maildir" {
+			maildirCfg, err := backends.ParseMaildirConfig(c)
+			if err != nil {
+				return err
+			}
+			config.AddMessageMiddleware(func(next smtpserver.MessageHandler) smtpserver.MessageHandler {
+				return backends.MaildirStorageBackend{Next: next, Config: maildirCfg}
+			})
 		}
 	}
 	return nil

@@ -17,7 +17,7 @@ func TestGetMaildirConfig___Rootpath(t *testing.T) {
   rootPath "/tmp/maildir"
 }`
 	c := newTestController(input)
-	maildirConfig, err := getMaildirConfig(c)
+	maildirConfig, err := ParseMaildirConfig(c)
 	assert.Nil(t, err)
 	assert.Equal(t, "/tmp/maildir", maildirConfig.rootPath)
 }
@@ -27,7 +27,7 @@ func TestGetMaildirConfig___RootpathValueAbsent(t *testing.T) {
   rootPath
 }`
 	c := newTestController(input)
-	_, err := getMaildirConfig(c)
+	_, err := ParseMaildirConfig(c)
 	assert.NotNil(t, err)
 }
 
@@ -36,6 +36,6 @@ func TestGetMaildirConfig___RootpathKeyAbsent(t *testing.T) {
   someOtherKey
 }`
 	c := newTestController(input)
-	_, err := getMaildirConfig(c)
+	_, err := ParseMaildirConfig(c)
 	assert.NotNil(t, err)
 }

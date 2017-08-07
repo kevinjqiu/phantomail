@@ -4,3 +4,4 @@ import:
   version: ^0.10.6
   subpackages:
   - caddyfile
+- package: github.com/sloonz/go-maildir
