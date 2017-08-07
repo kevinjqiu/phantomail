@@ -33,15 +33,18 @@ func (m maildirStorageBackend) Name() string {
 
 // MessageReceived is the handler method of a `MessageHandler`
 func (m maildirStorageBackend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
-	maildir, err := md.New(m.Config.rootPath, true)
-	if err != nil {
-		return "", err
+	for _, recipient := range msg.To {
+		maildirPath := fmt.Sprintf("%s/%s@%s", m.Config.rootPath, recipient.Mailbox, recipient.Domain)
+		maildir, err := md.New(maildirPath, true)
+		if err != nil {
+			return "", err
+		}
+		filename, err := maildir.CreateMail(msg.Bytes())
+		if err != nil {
+			return "", err
+		}
+		log.Printf("Message saved to %s\n", filename)
 	}
-	filename, err := maildir.CreateMail(msg.Bytes())
-	if err != nil {
-		return "", err
-	}
-	log.Printf("Saved message to %s\n", filename)
 	return smtpserver.Next(m.Next, msg)
 }
 
