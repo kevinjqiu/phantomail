@@ -68,11 +68,12 @@ func newSMTPClient(conn net.Conn, rootMessageHandler MessageHandler) *smtpClient
 
 // SMTPMessage represents an SMTP Message
 type SMTPMessage struct {
-	*data.SMTPMessage
+	*data.Message
 }
 
 func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, err error) {
-	wrappedMessage := SMTPMessage{msg}
+	parsedMessage := msg.Parse(client.proto.Hostname)
+	wrappedMessage := SMTPMessage{parsedMessage}
 	return Next("[root]", client.rootMessageHandler, &wrappedMessage)
 }
 

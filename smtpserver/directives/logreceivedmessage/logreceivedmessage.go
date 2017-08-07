@@ -33,12 +33,10 @@ type logReceivedMessage struct {
 }
 
 func (l logReceivedMessage) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
-	// m := msg.Parse(client.proto.Hostname)
-	m := msg.Parse("")
-	log.Printf("From: %s\n", m.From)
-	log.Printf("To: %s\n", m.To)
-	log.Printf("Received: %s\n", m.Created)
-	log.Printf("Content: %s\n", m.Content.Body)
+	log.Printf("From: %s\n", msg.From)
+	log.Printf("To: %s\n", msg.To)
+	log.Printf("Received: %s\n", msg.Created)
+	log.Printf("Content: %s\n", msg.Content.Body)
 	return smtpserver.Next(l.Name(), l.Next, msg)
 }
 
