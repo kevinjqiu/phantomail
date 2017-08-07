@@ -16,23 +16,22 @@ func init() {
 	})
 }
 
-type maildirConfig struct {
+type config struct {
 	rootPath string
 }
 
-// MaildirStorageBackend is the maildir storage backend
-type maildirStorageBackend struct {
+type backend struct {
 	Next   smtpserver.MessageHandler
-	Config maildirConfig
+	Config config
 }
 
 // Name is the name of the `MessageHandler`
-func (m maildirStorageBackend) Name() string {
+func (m backend) Name() string {
 	return "MaildirStorageBackend"
 }
 
 // MessageReceived is the handler method of a `MessageHandler`
-func (m maildirStorageBackend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
+func (m backend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
 	for _, recipient := range msg.To {
 		maildirPath := fmt.Sprintf("%s/%s@%s", m.Config.rootPath, recipient.Mailbox, recipient.Domain)
 		maildir, err := md.New(maildirPath, true)
@@ -55,13 +54,13 @@ func setup(c *caddy.Controller) error {
 	}
 	config := smtpserver.GetConfig(c)
 	config.AddMessageMiddleware(func(next smtpserver.MessageHandler) smtpserver.MessageHandler {
-		return maildirStorageBackend{Next: next, Config: maildirConfig}
+		return backend{Next: next, Config: maildirConfig}
 	})
 	return nil
 }
 
-func parseMaildirConfig(c *caddy.Controller) (maildirConfig, error) {
-	config := maildirConfig{}
+func parseMaildirConfig(c *caddy.Controller) (config, error) {
+	config := config{}
 	for c.Next() {
 		key := c.Val()
 		if key != "maildir" {

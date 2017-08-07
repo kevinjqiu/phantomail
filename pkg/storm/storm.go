@@ -3,6 +3,7 @@ package storm
 import (
 	"github.com/kevinjqiu/phantomail/pkg/smtpserver"
 	"github.com/mholt/caddy"
+	"fmt"
 )
 
 func init() {
@@ -12,8 +13,8 @@ func init() {
 	})
 }
 
-func parseStormConfig(c *caddy.Controller) (stormConfig, error) {
-	config := stormConfig{}
+func parseStormConfig(c *caddy.Controller) (config, error) {
+	config := config{}
 	for c.Next() {
 		key := c.Val()
 		if key != "storm" {
@@ -43,7 +44,28 @@ func setup(c *caddy.Controller) error {
 	}
 	config := smtpserver.GetConfig(c)
 	config.AddMessageMiddleware(func(next smtpserver.MessageHandler) smtpserver.MessageHandler {
-		return stormStorageBackend{Next: next, config: stormCfg}
+		return backend{Next: next, config: stormCfg}
 	})
 	return nil
+}
+
+type config struct {
+	path string
+}
+
+// StormStorageBackend stores incoming messages in a storm database
+type backend struct {
+	Next   smtpserver.MessageHandler
+	config config
+}
+
+// MessageReceived is the handler method of a `MessageHandler`
+func (s backend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
+	fmt.Println("TODO: implement StormStorageBackend")
+	return smtpserver.Next(s.Next, msg)
+}
+
+// Name is the name of the `MessageHandler`
+func (s backend) Name() string {
+	return "StormStorageBackend"
 }
