@@ -1,6 +1,8 @@
 package backends
 
 import (
+	"fmt"
+
 	"github.com/kevinjqiu/phantomail/smtpserver"
 
 	"github.com/mholt/caddy"
@@ -27,14 +29,18 @@ func NewStormStorageBackend(c *caddy.Controller, next smtpserver.MessageHandler)
 	return StormStorageBackend{Next: next} // TODO
 }
 
+// StormStorageBackend stores incoming messages in a storm database
 type StormStorageBackend struct {
 	Next smtpserver.MessageHandler
 }
 
+// MessageReceived is the handler method of a `MessageHandler`
 func (s StormStorageBackend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
-	return smtpserver.NextOrFailure(s.Name(), s.Next, msg)
+	fmt.Println("TODO: implement StormStorageBackend")
+	return smtpserver.Next(s.Name(), s.Next, msg)
 }
 
+// Name is the name of the `MessageHandler`
 func (s StormStorageBackend) Name() string {
 	return "StormStorageBackend"
 }

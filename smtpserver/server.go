@@ -1,7 +1,6 @@
 package smtpserver
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -31,13 +30,14 @@ func (s *SMTPServer) Listen() (net.Listener, error) {
 // Serve starts serving the requests using the listener
 // This satisfies the TCPServer interface
 func (s *SMTPServer) Serve(listener net.Listener) error {
+	s.config.buildMiddlewareStacks()
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			return err
 		}
 
-		client := newSMTPClient(conn, s.config.MessageMiddlewares)
+		client := newSMTPClient(conn, s.config.rootMessageHandler)
 
 		go client.handle()
 	}
@@ -49,35 +49,37 @@ type smtpClient struct {
 	reader             io.Reader
 	line               string
 	proto              *smtp.Protocol
-	messageMiddlewares []MessageMiddleware
+	rootMessageHandler MessageHandler
 }
 
-func newSMTPClient(conn net.Conn, messageMiddlewares []MessageMiddleware) *smtpClient {
+func newSMTPClient(conn net.Conn, rootMessageHandler MessageHandler) *smtpClient {
 	proto := smtp.NewProtocol()
 	client := &smtpClient{
 		conn:               conn,
 		writer:             io.Writer(conn),
 		reader:             io.Reader(conn),
 		proto:              proto,
-		messageMiddlewares: messageMiddlewares,
+		rootMessageHandler: rootMessageHandler,
 	}
-	// proto.MessageReceivedHandler = client.messageReceivedHandler
+	proto.MessageReceivedHandler = client.onMessageReceived
 	// TODO: other handlers
 	return client
 }
 
 // SMTPMessage represents an SMTP Message
 type SMTPMessage struct {
-	data.SMTPMessage
+	*data.SMTPMessage
 }
 
-func (client *smtpClient) onMessageReceived(msg *SMTPMessage) (id string, err error) {
-	m := msg.Parse(client.proto.Hostname)
-	fmt.Printf("From: %s\n", m.From)
-	fmt.Printf("To: %s\n", m.To)
-	fmt.Printf("Received: %s\n", m.Created)
-	fmt.Printf("Content: %s\n", m.Content.Body)
-	return "", nil
+func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, err error) {
+	wrappedMessage := SMTPMessage{msg}
+	return Next("[root]", client.rootMessageHandler, &wrappedMessage)
+	// m := msg.Parse(client.proto.Hostname)
+	// fmt.Printf("From: %s\n", m.From)
+	// fmt.Printf("To: %s\n", m.To)
+	// fmt.Printf("Received: %s\n", m.Created)
+	// fmt.Printf("Content: %s\n", m.Content.Body)
+	// return "", nil
 }
 
 func (client *smtpClient) writeReply(reply *smtp.Reply) {

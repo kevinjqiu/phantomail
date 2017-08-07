@@ -94,11 +94,11 @@ func (c *smtpContext) MakeServers() ([]caddy.Server, error) {
 
 // Config contains configuration details about an SMTP server type
 type Config struct {
-	Hostnames              []string
-	BindPort               string
-	BindAddr               string
-	MessageMiddlewares     []MessageMiddleware
-	messageMiddlewareStack MessageHandler
+	Hostnames          []string
+	BindPort           string
+	BindAddr           string
+	MessageMiddlewares []MessageMiddleware
+	rootMessageHandler MessageHandler
 }
 
 // Bind returns the bind information (address + port) for the SMTP server
@@ -112,15 +112,12 @@ func (c *Config) AddMessageMiddleware(mm MessageMiddleware) {
 }
 
 func (c *Config) buildMiddlewareStacks() {
-	// TODO: support multiple SMTP "sites"
-	// TODO: fix this
 	var stack MessageHandler
 	for i := len(c.MessageMiddlewares) - 1; i >= 0; i-- {
 		stack = c.MessageMiddlewares[i](stack)
 	}
 
-	c.messageMiddlewareStack = stack
-	fmt.Println(c.messageMiddlewareStack)
+	c.rootMessageHandler = stack
 }
 
 func newContext() caddy.Context {
