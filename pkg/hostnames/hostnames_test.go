@@ -3,7 +3,7 @@ package hostnames
 import (
 	"testing"
 
-	"github.com/kevinjqiu/phantomail/smtpserver"
+	"github.com/kevinjqiu/phantomail/pkg/smtpserver"
 	"github.com/mholt/caddy"
 	"github.com/stretchr/testify/assert"
 )

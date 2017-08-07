@@ -13,29 +13,29 @@ func newTestController(input string) *caddy.Controller {
 	return c
 }
 func TestGetMaildirConfig___Rootpath(t *testing.T) {
-	input := `{
+	input := `maildir {
   rootPath "/tmp/maildir"
 }`
 	c := newTestController(input)
-	maildirConfig, err := ParseMaildirConfig(c)
+	maildirConfig, err := parseMaildirConfig(c)
 	assert.Nil(t, err)
 	assert.Equal(t, "/tmp/maildir", maildirConfig.rootPath)
 }
 
 func TestGetMaildirConfig___RootpathValueAbsent(t *testing.T) {
-	input := `{
+	input := `maildir {
   rootPath
 }`
 	c := newTestController(input)
-	_, err := ParseMaildirConfig(c)
+	_, err := parseMaildirConfig(c)
 	assert.NotNil(t, err)
 }
 
 func TestGetMaildirConfig___RootpathKeyAbsent(t *testing.T) {
-	input := `{
+	input := `maildir {
   someOtherKey
 }`
 	c := newTestController(input)
-	_, err := ParseMaildirConfig(c)
+	_, err := parseMaildirConfig(c)
 	assert.NotNil(t, err)
 }

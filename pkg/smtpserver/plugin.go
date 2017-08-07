@@ -12,7 +12,7 @@ import (
 // ServerType is the server type of this Caddy plugin
 const ServerType = "smtp"
 
-var directives = []string{"hostnames", "storage", "logreceivedmessage"}
+var directives = []string{"hostnames", "maildir", "logreceivedmessage"}
 
 func init() {
 	caddy.RegisterServerType(ServerType, caddy.ServerType{

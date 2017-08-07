@@ -3,7 +3,7 @@ package logreceivedmessage
 import (
 	"log"
 
-	"github.com/kevinjqiu/phantomail/smtpserver"
+	"github.com/kevinjqiu/phantomail/pkg/smtpserver"
 	"github.com/mholt/caddy"
 )
 
