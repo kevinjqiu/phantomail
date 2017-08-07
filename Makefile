@@ -2,6 +2,7 @@ test:
 	go test github.com/kevinjqiu/phantomail/pkg/...
 
 deps:
+	go get -v github.com/Masterminds/glide
 	glide install
 
 build: deps
