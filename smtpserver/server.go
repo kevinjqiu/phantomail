@@ -74,7 +74,7 @@ type SMTPMessage struct {
 func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, err error) {
 	parsedMessage := msg.Parse(client.proto.Hostname)
 	wrappedMessage := SMTPMessage{parsedMessage}
-	return Next("[root]", client.rootMessageHandler, &wrappedMessage)
+	return Next(client.rootMessageHandler, &wrappedMessage)
 }
 
 func (client *smtpClient) writeReply(reply *smtp.Reply) {

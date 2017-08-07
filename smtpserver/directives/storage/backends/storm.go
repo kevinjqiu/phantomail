@@ -37,7 +37,7 @@ type StormStorageBackend struct {
 // MessageReceived is the handler method of a `MessageHandler`
 func (s StormStorageBackend) MessageReceived(msg *smtpserver.SMTPMessage) (string, error) {
 	fmt.Println("TODO: implement StormStorageBackend")
-	return smtpserver.Next(s.Name(), s.Next, msg)
+	return smtpserver.Next(s.Next, msg)
 }
 
 // Name is the name of the `MessageHandler`

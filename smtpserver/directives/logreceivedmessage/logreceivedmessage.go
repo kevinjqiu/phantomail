@@ -37,7 +37,7 @@ func (l logReceivedMessage) MessageReceived(msg *smtpserver.SMTPMessage) (string
 	log.Printf("To: %s\n", msg.To)
 	log.Printf("Received: %s\n", msg.Created)
 	log.Printf("Content: %s\n", msg.Content.Body)
-	return smtpserver.Next(l.Name(), l.Next, msg)
+	return smtpserver.Next(l.Next, msg)
 }
 
 func (l logReceivedMessage) Name() string {

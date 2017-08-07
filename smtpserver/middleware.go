@@ -13,7 +13,7 @@ type (
 )
 
 // Next chains the middlewares together and executes them
-func Next(name string, next MessageHandler, msg *SMTPMessage) (string, error) {
+func Next(next MessageHandler, msg *SMTPMessage) (string, error) {
 	if next != nil {
 		return next.MessageReceived(msg)
 	}
