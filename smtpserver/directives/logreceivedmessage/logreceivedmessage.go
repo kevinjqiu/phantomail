@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	caddy.RegisterPlugin("logreceivedmessage", caddy.Plugin{
+	caddy.RegisterPlugin("logReceivedMessage", caddy.Plugin{
 		ServerType: smtpserver.ServerType,
 		Action:     setup,
 	})

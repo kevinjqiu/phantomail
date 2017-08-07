@@ -1,10 +1,10 @@
 smtp://*:2525 {
     hostnames "phantomail.com" "mail.phantomail.com"
-    logreceivedmessage {
-        file "/dev/stderr"
-    }
+    logReceivedMessage
     storage storm {
         path "phantomail.db"
     }
-    storage maildir
+    storage maildir {
+        rootPath "/tmp/phantomail.com/"
+    }
 }
