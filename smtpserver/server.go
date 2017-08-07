@@ -74,12 +74,6 @@ type SMTPMessage struct {
 func (client *smtpClient) onMessageReceived(msg *data.SMTPMessage) (id string, err error) {
 	wrappedMessage := SMTPMessage{msg}
 	return Next("[root]", client.rootMessageHandler, &wrappedMessage)
-	// m := msg.Parse(client.proto.Hostname)
-	// fmt.Printf("From: %s\n", m.From)
-	// fmt.Printf("To: %s\n", m.To)
-	// fmt.Printf("Received: %s\n", m.Created)
-	// fmt.Printf("Content: %s\n", m.Content.Body)
-	// return "", nil
 }
 
 func (client *smtpClient) writeReply(reply *smtp.Reply) {
@@ -170,7 +164,7 @@ func NewSMTPServer(cfg *Config) *SMTPServer {
 func GetConfig(c *caddy.Controller) *Config {
 	ctx := c.Context().(*smtpContext)
 	key := c.Key
-	if c.ServerType() == serverType {
+	if c.ServerType() == ServerType {
 		if cfg, ok := ctx.keysToConfigs[key]; ok {
 			return cfg
 		}

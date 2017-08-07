@@ -9,16 +9,17 @@ import (
 	"github.com/mholt/caddy/caddyfile"
 )
 
-const serverType = "smtp"
+// ServerType is the server type of this Caddy plugin
+const ServerType = "smtp"
 
-var directives = []string{"hostnames", "storage"}
+var directives = []string{"hostnames", "storage", "logreceivedmessage"}
 
 func init() {
-	caddy.RegisterServerType(serverType, caddy.ServerType{
+	caddy.RegisterServerType(ServerType, caddy.ServerType{
 		Directives: func() []string { return directives },
 		DefaultInput: func() caddy.Input {
 			return caddy.CaddyfileInput{
-				ServerTypeName: serverType,
+				ServerTypeName: ServerType,
 			}
 		},
 		NewContext: newContext,

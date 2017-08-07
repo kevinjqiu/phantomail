@@ -8,7 +8,7 @@ import (
 
 func init() {
 	caddy.RegisterPlugin("storage", caddy.Plugin{
-		ServerType: "smtp",
+		ServerType: smtpserver.ServerType,
 		Action:     setupStorage,
 	})
 }
