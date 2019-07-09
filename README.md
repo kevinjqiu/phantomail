@@ -8,6 +8,6 @@
 
 [![Build Status](https://travis-ci.org/kevinjqiu/phantomail.svg?branch=master)](https://travis-ci.org/kevinjqiu/phantomail)
 
-Phantomail is a [Caddy](https://caddyserver.com) [server type plugin](https://github.com/mholt/caddy/wiki/Writing-a-Plugin:-Server-Type) that provides SMTP functionality.
+Phantomail is a [Caddy](https://caddyserver.com) [server type plugin](https://github.com/caddyserver/caddy/wiki/Writing-a-Plugin:-Server-Type) that provides SMTP functionality.
 
 It can be used as a testing SMTP server or a spam sinkhole
