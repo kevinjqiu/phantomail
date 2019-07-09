@@ -8,7 +8,7 @@ import (
 
 	"github.com/mailhog/data"
 	"github.com/mailhog/smtp"
-	"github.com/mholt/caddy"
+	"github.com/caddyserver/caddy"
 )
 
 // SMTPServer represents an SMTP server

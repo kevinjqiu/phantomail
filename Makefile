@@ -7,6 +7,6 @@ deps:
 
 build: deps
 	mkdir -p build
-	patch vendor/github.com/mholt/caddy/caddy/caddymain/run.go < patch.diff
-	cd vendor/github.com/mholt/caddy/caddy/ && go build
-	cp vendor/github.com/mholt/caddy/caddy/caddy build/
+	patch vendor/github.com/caddyserver/caddy/caddy/caddymain/run.go < patch.diff
+	cd vendor/github.com/caddyserver/caddy/caddy/ && go build
+	cp vendor/github.com/caddyserver/caddy/caddy/caddy build/

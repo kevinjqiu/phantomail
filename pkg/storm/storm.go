@@ -2,7 +2,7 @@ package storm
 
 import (
 	"github.com/kevinjqiu/phantomail/pkg/smtpserver"
-	"github.com/mholt/caddy"
+	"github.com/caddyserver/caddy"
 	"fmt"
 )
 

@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/kevinjqiu/phantomail/pkg/smtpserver"
-	"github.com/mholt/caddy"
+	"github.com/caddyserver/caddy"
 	md "github.com/sloonz/go-maildir"
 	"os"
 	"strconv"
